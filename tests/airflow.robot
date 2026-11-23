@@ -18,6 +18,21 @@ Configure airflow
 Check Web Response
     Wait Until Keyword Succeeds    5 min    5 sec    Check Health
 
+Check Airflow Background Services
+    ${rc}=    Execute Command
+    ...    runagent -m ${module_id} bash -ec 'for role in scheduler dag-processor triggerer; do systemctl --user is-active --quiet "airflow-$role.service"; done'
+    ...    return_stdout=False    return_rc=True
+    Should Be Equal As Integers    ${rc}    0
+
+Recover Module Volumes
+    ${rc}=    Execute Command    runagent -m ${module_id} module-dump-state    return_stdout=False    return_rc=True
+    Should Be Equal As Integers    ${rc}    0
+    ${rc}=    Execute Command
+    ...    runagent -m ${module_id} bash -ec 'test -s airflow-data.tar && test -s airflow-db.tar && systemctl --user stop airflow.service && podman volume rm airflow-data airflow-db && "$AGENT_INSTALL_DIR/actions/restore-module/40restore_volume" && systemctl --user start airflow.service airflow-web.service'
+    ...    return_stdout=False    return_rc=True
+    Should Be Equal As Integers    ${rc}    0
+    Wait Until Keyword Succeeds    5 min    5 sec    Check Health
+
 Remove airflow
     ${rc}=    Execute Command    remove-module --no-preserve ${module_id}    return_stdout=False    return_rc=True
     Should Be Equal As Integers    ${rc}    0
