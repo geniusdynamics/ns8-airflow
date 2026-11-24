@@ -1,0 +1,34 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2025 Genius Dynamics
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Load the database dump taken by module-dump-state into a new, empty
+# airflow-db volume, using an ephemeral PostgreSQL container.
+set -e -o pipefail
+exec 1>&2
+
+mkdir -vp restore
+cat - >restore/airflow_restore.sh <<'EOS'
+# The dump is read from standard input
+pg_restore --no-owner --no-privileges -U airflow -d airflow
+ec=$?
+docker_temp_server_stop
+exit $ec
+EOS
+
+podman run \
+    --rm \
+    --interactive \
+    --network=none \
+    --volume=./restore:/docker-entrypoint-initdb.d/:Z \
+    --volume=airflow-db:/var/lib/postgresql/data:Z \
+    --replace --name=restore_db \
+    --env-file=database.env \
+    --env TZ=UTC \
+    "${POSTGRES_IMAGE}" < airflow.pg_dump
+
+# Restore succeeded: clean up
+rm -rfv restore airflow.pg_dump

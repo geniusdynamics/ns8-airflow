@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# Copyright (C) 2023 Nethesis S.r.l.
+# Copyright (C) 2025 Genius Dynamics
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
@@ -13,8 +13,11 @@ import os
 request = json.load(sys.stdin)
 renv = request['environment']
 
+# Let's Encrypt is never restored: DNS may not point to this node yet.
+# The administrator enables it again from Settings.
 configure_retval = agent.tasks.run(agent_id=os.environ['AGENT_ID'], action='configure-module', data={
     "host": renv["TRAEFIK_HOST"],
-    "http2https": renv["TRAEFIK_HTTP2HTTPS"] == "True",
+    "http2https": renv.get("TRAEFIK_HTTP2HTTPS", "True").lower() == "true",
+    "lets_encrypt": False,
 })
 agent.assert_exp(configure_retval['exit_code'] == 0, "The configure-module subtask failed!")

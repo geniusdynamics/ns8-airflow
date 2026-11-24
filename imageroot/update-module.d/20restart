@@ -1,3 +1,5 @@
 #!/bin/bash
 set -e
-systemctl --user try-restart airflow.service airflow-db.service airflow-web.service airflow-scheduler.service airflow-dag-processor.service airflow-triggerer.service
+exec 1>&2
+systemctl --user try-restart airflow.service airflow-db.service airflow-web.service \
+    airflow-scheduler.service airflow-dag-processor.service airflow-triggerer.service

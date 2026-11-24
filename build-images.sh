@@ -39,10 +39,8 @@ buildah run \
 buildah add "${container}" imageroot /imageroot
 buildah add "${container}" ui/dist /ui
 # Setup the entrypoint, ask to reserve one TCP port with the label and set a rootless container
-# Select you image(s) with the label org.nethserver.images
-# ghcr.io/xxxxx is the GitHub container registry or your own registry or docker.io for Docker Hub
-# The image tag is set to latest by default, but can be overridden with the IMAGETAG environment variable
-# --label="org.nethserver.images=docker.io/mariadb:13.0.2 docker.io/roundcube/roundcubemail:1.6.19-apache"
+# Every image pulled at runtime is listed in org.nethserver.images with a fully pinned tag
+# (verified on the registry), so that Renovate can track upstream releases.
 # rootfull=0 === rootless container
 # tcp-ports-demand=1 number of tcp Port to reserve , 1 is the minimum, can be udp or tcp
 buildah config --entrypoint=/ \
@@ -50,7 +48,7 @@ buildah config --entrypoint=/ \
     --label="org.nethserver.tcp-ports-demand=1" \
     --label="org.nethserver.rootfull=0" \
     --label="org.nethserver.min-core=3.20.1" \
-    --label="org.nethserver.images=docker.io/apache/airflow:3.4.0 docker.io/library/postgres:17.11-alpine" \
+    --label="org.nethserver.images=docker.io/apache/airflow:3.4.0 docker.io/library/postgres:17.12-alpine" \
     "${container}"
 # Commit the image
 buildah commit "${container}" "${repobase}/${reponame}"

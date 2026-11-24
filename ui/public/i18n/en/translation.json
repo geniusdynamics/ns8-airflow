@@ -19,26 +19,26 @@
     "no_services": "No services",
     "no_images": "No images",
     "no_volumes": "No volumes",
-    "airflow_webapp": "airflow webapp",
+    "airflow_webapp": "Airflow web interface",
     "not_configured": "Not configured",
-    "open_webapp": "Open airflow",
-    "configure": "Configure"
+    "open_webapp": "Open Airflow",
+    "configure": "Configure",
+    "admin_credentials_title": "Initial administrator credentials",
+    "admin_credentials_description": "Sign in as admin. The initial password is generated when the module is created. To read it, run this command on the node as root: runagent -m {instance} airflow-initial-credentials. Change it from the Airflow web interface after the first login."
   },
   "settings": {
     "title": "Settings",
-    "configure_instance": "Configure {instance}",
     "save": "Save",
-    "airflow_fqdn": "airflow hostname (FQDN)",
-    "lets_encrypt": "Request LE Certificate",
-    "http_to_https": "Force HTTPS",
+    "airflow_fqdn": "Airflow hostname (FQDN)",
+    "http_to_https": "Redirect HTTP to HTTPS",
     "enabled": "Enabled",
     "disabled": "Disabled",
-    "advanced": "Advanced",
     "configuring": "Configuring",
-    "instance_configuration": "Configure airflow",
+    "instance_configuration": "Configure {instance}",
     "domain_already_used_in_traefik": "Domain already used in traefik",
     "host_pattern": "Must be a valid fully qualified domain name",
-    "host_format": "Must be a valid fully qualified domain name"
+    "host_format": "Must be a valid fully qualified domain name",
+    "airflow_fqdn_placeholder": "airflow.example.org"
   },
   "about": {
     "title": "About"
