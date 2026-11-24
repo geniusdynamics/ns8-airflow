@@ -1,0 +1,16 @@
+[Unit]
+Description=Apache Airflow dag-processor
+BindsTo=airflow.service
+PartOf=airflow.service
+After=airflow.service airflow-db.service airflow-web.service
+
+[Service]
+Type=notify
+NotifyAccess=all
+EnvironmentFile=%E/state/environment
+Restart=on-failure
+TimeoutStartSec=300
+TimeoutStopSec=75
+ExecStart=/usr/bin/podman run --pod airflow --env-file=%E/state/airflow.env --volume airflow-data:/opt/airflow:Z,U --replace --name %N --sdnotify=conmon --cgroups=no-conmon ${AIRFLOW_IMAGE} dag-processor
+ExecStop=/usr/bin/podman stop --ignore -t 30 %N
+ExecStopPost=/usr/bin/podman rm --ignore -f %N

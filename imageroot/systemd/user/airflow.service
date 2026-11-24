@@ -1,0 +1,17 @@
+[Unit]
+Description=Apache Airflow pod
+Requires=airflow-db.service airflow-web.service airflow-scheduler.service airflow-dag-processor.service airflow-triggerer.service
+Before=airflow-db.service airflow-web.service airflow-scheduler.service airflow-dag-processor.service airflow-triggerer.service
+
+[Service]
+Type=forking
+EnvironmentFile=%E/state/environment
+PIDFile=%t/airflow.pid
+ExecStartPre=/usr/bin/rm -f %t/airflow.pid
+ExecStartPre=/usr/bin/podman pod create --replace --name airflow --infra-conmon-pidfile %t/airflow.pid --publish 127.0.0.1:${TCP_PORT}:8080
+ExecStart=/usr/bin/podman pod start airflow
+ExecStop=/usr/bin/podman pod stop --ignore -t 30 airflow
+ExecStopPost=/usr/bin/podman pod rm --ignore -f airflow
+
+[Install]
+WantedBy=default.target
