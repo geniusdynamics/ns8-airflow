@@ -39,6 +39,20 @@
         />
       </cv-column>
     </cv-row>
+    <cv-row v-if="host">
+      <cv-column>
+        <NsInlineNotification
+          kind="info"
+          :title="$t('status.admin_credentials_title')"
+          :description="
+            $t('status.admin_credentials_description', {
+              instance: instanceName,
+            })
+          "
+          :showCloseButton="false"
+        />
+      </cv-column>
+    </cv-row>
     <cv-row>
       <cv-column :md="4" :max="4">
         <NsInfoCard

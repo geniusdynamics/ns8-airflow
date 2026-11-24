@@ -1,3 +1,9 @@
 #!/bin/bash
-set -e
-rm -f airflow-data.tar airflow-db.tar
+
+#
+# Copyright (C) 2025 Genius Dynamics
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Runs after the restic backup: remove the temporary database dump.
+rm -vf airflow.pg_dump

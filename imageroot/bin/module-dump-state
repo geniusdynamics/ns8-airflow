@@ -1,18 +1,25 @@
 #!/bin/bash
+
+#
+# Copyright (C) 2025 Genius Dynamics
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Runs before the restic backup, with state/ as working directory. The
+# application keeps running: pg_dump takes a consistent snapshot.
 set -euo pipefail
+exec 1>&2
 umask 077
-running=false
-if systemctl --user is-active --quiet airflow.service; then running=true; fi
-finish() {
-    status=$?
-    rm -f "${tempfile:-}"
-    if "$running"; then systemctl --user start airflow.service airflow-db.service airflow-web.service airflow-scheduler.service airflow-dag-processor.service airflow-triggerer.service || status=1; fi
-    exit "$status"
-}
-trap finish EXIT
-if "$running"; then systemctl --user stop airflow.service; fi
-for volume in airflow-data airflow-db; do
-    tempfile=$(mktemp -p "$PWD")
-    podman unshare bash -ec 'tar --numeric-owner -C "$(podman volume mount "$1")" -cpf "$2" .' bash "$volume" "$tempfile"
-    mv -f "$tempfile" "$volume.tar"
-done
+
+if ! systemctl --user is-active --quiet airflow-db.service; then
+    echo "airflow-db.service is not running: no database dump written" >&2
+    rm -f airflow.pg_dump
+    exit 0
+fi
+
+tmpfile=$(mktemp -p "$PWD" airflow.pg_dump.XXXXXX)
+trap 'rm -f "$tmpfile"' EXIT
+podman exec airflow-db pg_dump -U airflow --format=c airflow > "$tmpfile"
+test -s "$tmpfile"
+mv -f "$tmpfile" airflow.pg_dump
+echo "Database dump written to airflow.pg_dump"

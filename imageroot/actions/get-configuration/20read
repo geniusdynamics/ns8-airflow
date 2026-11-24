@@ -5,22 +5,19 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-#
-# Read configuration
-#
-
+# Read the current configuration. No secret is ever returned here.
 import os
 import sys
 import json
 import agent
 
-# Prepare return variable
 config = {}
+config["host"] = os.getenv("TRAEFIK_HOST", "")
+config["http2https"] = os.getenv("TRAEFIK_HTTP2HTTPS", "True").lower() == "true"
+try:
+    config["lets_encrypt"] = bool(agent.get_route(os.environ['MODULE_ID']).get('lets_encrypt', False))
+except Exception:
+    # No route yet: the module has not been configured
+    config["lets_encrypt"] = False
 
-# Read current configuration from the environment file
-config["host"] = os.getenv("TRAEFIK_HOST","")
-config["http2https"] = os.getenv("TRAEFIK_HTTP2HTTPS") == "True"
-config["lets_encrypt"] = agent.get_route(os.environ['MODULE_ID']).get('lets_encrypt', False)
-
-# Dump the configuration to stdout
 json.dump(config, fp=sys.stdout)

@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "Get airflow settings",
-    "$id": "http://nethserver.org/json-schema/task/input/airflow/get-configuration",
+    "$id": "http://nethserver.org/json-schema/task/output/airflow/get-configuration",
     "description": "Get airflow settings",
     "examples": [
         {
@@ -19,8 +19,7 @@
     "properties": {
         "host": {
             "type": "string",
-            "description": "Host name for the application, like 'airflow.domain.org'",
-            "format": "idn-hostname"
+            "description": "Host name for the application, like 'airflow.domain.org'. Empty before the first configuration."
         },
         "lets_encrypt": {
             "type": "boolean",
